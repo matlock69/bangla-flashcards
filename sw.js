@@ -1,5 +1,5 @@
 // Offline support. When you change any file, change the version below (v1 -> v2) so phones pick up the update.
-const CACHE = 'bangla-fc-v1';
+const CACHE = 'bangla-fc-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
