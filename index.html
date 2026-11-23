@@ -78,6 +78,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent
 .start:disabled { opacity: .45; cursor: default; }
 .foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
 .linkbtn { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-size: 13px; }
+.guide { color: var(--accent); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; white-space: nowrap; }
+.guide:hover { color: #e89474; }
+.guide:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.guide .gmeta { font-weight: 400; }
 
 /* ---------- study ---------- */
 .topbar { display: flex; align-items: center; gap: 12px; padding: 12px 16px 8px; max-width: 620px; width: 100%; margin: 0 auto; }
@@ -145,6 +149,7 @@ dialog .row button { padding: 10px 14px; border-radius: 10px; font-weight: 600; 
 .install b { color: var(--text); }
 .install .x { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; color: var(--muted); font-size: 18px; }
 .credits { font-size: 14px; line-height: 1.5; }
+.update { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top) + 10px); left: 50%; transform: translateX(-50%); background: var(--accent); color: #1f1e1d; font-weight: 700; font-size: 15px; padding: 10px 18px; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,.4); white-space: nowrap; }
 .credits p { margin-bottom: 10px; }
 .credits a { color: var(--accent); }
 
@@ -172,7 +177,7 @@ dialog .row button { padding: 10px 14px; border-radius: 10px; font-weight: 600; 
     <div class="home-inner">
       <div class="title">
         <h1>Bangla Flashcards <span class="bn">শব্দভান্ডার</span></h1>
-        <p id="subtitle">Loading your cards…</p>
+        <p><span id="subtitle">Loading your cards…</span> <a class="guide" id="lnk-guide" href="Bangla-grammar-guide.pdf" target="_blank" rel="noopener">Grammar guide<span class="gmeta"> (PDF)</span>&nbsp;↗</a></p>
       </div>
       <div class="install" id="install" hidden>
         <b>Use it offline:</b> tap the Share button, then <b>Add to Home Screen</b>. Open the cards from the new icon from then on. Progress made in Safari and in the home-screen app is kept separately.
@@ -271,6 +276,7 @@ dialog .row button { padding: 10px 14px; border-radius: 10px; font-weight: 600; 
   </div>
 </dialog>
 
+<button type="button" class="update" id="update" hidden>New cards ready · tap to update</button>
 <dialog id="dlg-about">
   <div class="credits">
     <p><b>Bangla Flashcards</b>: the alphabet, 248 verbs and 211 nouns, with illustrations.</p>
@@ -1067,9 +1073,14 @@ dialog .row button { padding: 10px 14px; border-radius: 10px; font-weight: 600; 
   const about = $('dlg-about');
   $('btn-about').addEventListener('click', () => { try { about.showModal(); } catch (e) { about.setAttribute('open', ''); } });
   $('about-close').addEventListener('click', () => about.close());
-  if ('serviceWorker' in navigator && location.protocol === 'https:' || location.hostname === 'localhost') {
-    try { navigator.serviceWorker.register('sw.js'); } catch (e) {}
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    try {
+      const hadController = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) $('update').hidden = false; });
+      navigator.serviceWorker.register('sw.js');
+    } catch (e) {}
   }
+  $('update').addEventListener('click', () => location.reload());
 })();
 </script>
 </body>
